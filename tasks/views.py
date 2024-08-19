@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import ModelViewSet
 
 from tasks.models import Task, Employee
+from tasks.paginations import CustomPagination
 from tasks.serializers import EmployeeSerializer, TaskSerializer, TaskUpdateSerializer, ImportantTaskSerializer
 
 
@@ -13,6 +14,7 @@ class EmployeeViewSet(ModelViewSet):
     """
     serializer_class = EmployeeSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         """
@@ -48,6 +50,7 @@ class TaskListAPIView(ListAPIView):
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
     permission_classes = (AllowAny,)
+    pagination_class = CustomPagination
 
 
 class ImportantTaskListAPIView(ListAPIView):
