@@ -1,6 +1,4 @@
 from django.db.models import Count
-from django.utils.decorators import method_decorator
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      ListAPIView, RetrieveAPIView,
                                      UpdateAPIView)
@@ -13,59 +11,6 @@ from tasks.serializers import (BusyEmployeeListSerializer, EmployeeSerializer,
                                TaskUpdateSerializer)
 
 
-# @method_decorator(
-#     name="list",
-#     decorator=swagger_auto_schema(
-#         operation_description="Контроллер постраничного вывода списка сотрудников, "
-#         "отсортированных по количеству активных задач, "
-#         "с указанием количества активных задач."
-#     ),
-# )
-# @method_decorator(
-#     name="retrieve",
-#     decorator=swagger_auto_schema(
-#         operation_description="Контроллер просмотра информации по сотруднику."
-#     ),
-# )
-# @method_decorator(
-#     name="create",
-#     decorator=swagger_auto_schema(
-#         operation_description="Контроллер создания сотрудника."
-#     ),
-# )
-# @method_decorator(
-#     name="update",
-#     decorator=swagger_auto_schema(
-#         operation_description="Контроллер изменения сотрудника."
-#     ),
-# )
-# @method_decorator(
-#     name="destroy",
-#     decorator=swagger_auto_schema(
-#         operation_description="Контроллер удаления сотрудника."
-#     ),
-# )
-# class EmployeeViewSet(ModelViewSet):
-#     """
-#     Контроллер модели сотрудника.
-#     """
-#
-#     serializer_class = EmployeeSerializer
-#     permission_classes = (IsAuthenticatedOrReadOnly,)
-#     pagination_class = CustomPagination
-#
-#     def get_queryset(self):
-#         """
-#         Возвращает список сотрудников,
-#         отсортированный по количеству их активных задач
-#         """
-#         queryset = (
-#             Employee.objects.all()
-#             .annotate(task_count=Count("tasks"))
-#             .order_by("task_count")
-#         )
-#         return queryset
-#
 class EmployeeCreateAPIView(CreateAPIView):
     """
     Контроллер создания сотрудника.
