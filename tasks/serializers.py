@@ -1,4 +1,3 @@
-from django.db.models import Min
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
 
@@ -10,6 +9,7 @@ class EmployeeSerializer(ModelSerializer):
     """
     Сериализатор сотрудника.
     """
+
     tasks = SerializerMethodField()
     task_count = SerializerMethodField()
 
@@ -17,42 +17,49 @@ class EmployeeSerializer(ModelSerializer):
         model = Employee
         fields = "__all__"
         validators = [
-            NameValidator(field="name",),
+            NameValidator(
+                field="name",
+            ),
         ]
 
     def get_tasks(self, employee):
         """
         Возвращает список активных заданий сотрудника.
         """
-        return [task.title for task in Task.objects.filter(executor=employee, status='IN_PROGRESS')]
+        return [
+            task.title
+            for task in Task.objects.filter(executor=employee, status="IN_PROGRESS")
+        ]
 
     def get_task_count(self, employee):
         """
         Возвращает количество активных заданий сотрудника.
         """
-        return Task.objects.filter(executor=employee, status='IN_PROGRESS').count()
+        return Task.objects.filter(executor=employee, status="IN_PROGRESS").count()
 
 
 class TaskSerializer(ModelSerializer):
     """
     Сериализатор задачи.
     """
+
     class Meta:
         model = Task
         fields = "__all__"
         validators = [
             DeadlineValidator(field="deadline"),
         ]
-        read_only_fields = ('status',)
+        read_only_fields = ("status",)
 
 
 class TaskUpdateSerializer(ModelSerializer):
     """
     Сериализатор изменения задачи.
     """
+
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = "__all__"
         validators = [
             DeadlineValidator(field="deadline"),
         ]
@@ -62,6 +69,7 @@ class ImportantTaskSerializer(ModelSerializer):
     """
     Сериализатор важной задачи.
     """
+
     possible_executors = SerializerMethodField()
 
     class Meta:
@@ -73,10 +81,6 @@ class ImportantTaskSerializer(ModelSerializer):
         Возвращает имена сотрудников, кому можно назначить
         задачу, не взятую в работу.
         """
-        # Получаем количество задач исполнителя зависимой задачи
-        dependent_task = Task.objects.get(parent_task=task)
-        current_executor = dependent_task.executor
-        current_task_count = current_executor.tasks.count()
 
         # Получаем сотрудников с наименьшим количеством задач на исполнении
         employees = Employee.objects.all()
@@ -86,9 +90,16 @@ class ImportantTaskSerializer(ModelSerializer):
 
         min_task_count = min(employees_task_count.values())
         possible_executors = [
-            employee for employee in employees_task_count
+            employee
+            for employee in employees_task_count
             if employees_task_count[employee] == min_task_count
         ]
+
+        # Получаем количество задач исполнителя зависимой задачи
+        dependent_task = Task.objects.get(parent_task=task)
+        current_executor = dependent_task.executor
+        current_task_count = current_executor.tasks.count()
+
         # Добавляем к списку исполнителя зависимой задачи, если его нет в списке,
         # и ему назначено максимум на 2 задачи больше, чем у наименее загруженного сотрудника
 

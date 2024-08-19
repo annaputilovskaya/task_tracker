@@ -1,17 +1,55 @@
 from django.db.models import Count
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
+from django.utils.decorators import method_decorator
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.generics import (CreateAPIView, DestroyAPIView,
+                                     ListAPIView, RetrieveAPIView,
+                                     UpdateAPIView)
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import ModelViewSet
 
-from tasks.models import Task, Employee
+from tasks.models import Employee, Task
 from tasks.paginations import CustomPagination
-from tasks.serializers import EmployeeSerializer, TaskSerializer, TaskUpdateSerializer, ImportantTaskSerializer
+from tasks.serializers import (EmployeeSerializer, ImportantTaskSerializer,
+                               TaskSerializer, TaskUpdateSerializer)
 
 
+@method_decorator(
+    name="list",
+    decorator=swagger_auto_schema(
+        operation_description="Контроллер постраничного вывода списка сотрудников, "
+        "отсортированных по количеству активных задач, "
+        "с указанием количества активных задач."
+    ),
+)
+@method_decorator(
+    name="retrieve",
+    decorator=swagger_auto_schema(
+        operation_description="Контроллер просмотра информации по сотруднику."
+    ),
+)
+@method_decorator(
+    name="create",
+    decorator=swagger_auto_schema(
+        operation_description="Контроллер создания сотрудника."
+    ),
+)
+@method_decorator(
+    name="update",
+    decorator=swagger_auto_schema(
+        operation_description="Контроллер изменения сотрудника."
+    ),
+)
+@method_decorator(
+    name="destroy",
+    decorator=swagger_auto_schema(
+        operation_description="Контроллер удаления сотрудника."
+    ),
+)
 class EmployeeViewSet(ModelViewSet):
     """
     Контроллер модели сотрудника.
     """
+
     serializer_class = EmployeeSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = CustomPagination
@@ -21,7 +59,11 @@ class EmployeeViewSet(ModelViewSet):
         Возвращает список сотрудников,
         отсортированный по количеству их активных задач
         """
-        queryset = Employee.objects.all().annotate(task_count=Count('tasks')).order_by('task_count')
+        queryset = (
+            Employee.objects.all()
+            .annotate(task_count=Count("tasks"))
+            .order_by("task_count")
+        )
         return queryset
 
 
@@ -29,6 +71,7 @@ class TaskCreateAPIView(CreateAPIView):
     """
     Создание новой задачи.
     """
+
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
 
@@ -47,6 +90,7 @@ class TaskListAPIView(ListAPIView):
     """
     Получение списка всех задач.
     """
+
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
     permission_classes = (AllowAny,)
@@ -58,6 +102,7 @@ class ImportantTaskListAPIView(ListAPIView):
     Получение списка важных задач, не взятых в работу, в формате:
     {<Важная задача>, <Срок>, [<ФИО сотрудников, кому можно назначить задачу>]}
     """
+
     serializer_class = ImportantTaskSerializer
 
     def get_queryset(self):
@@ -66,8 +111,7 @@ class ImportantTaskListAPIView(ListAPIView):
         """
         important_tasks = []
         dependent_tasks = Task.objects.exclude(parent_task=None).filter(
-            status='IN_PROGRESS',
-            parent_task__status='NEW'
+            status="IN_PROGRESS", parent_task__status="NEW"
         )
         for task in dependent_tasks:
             important_tasks.append(task.parent_task)
@@ -78,6 +122,7 @@ class TaskRetrieveAPIView(RetrieveAPIView):
     """
     Получение информации о конкретной задаче.
     """
+
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
     permission_classes = (AllowAny,)
@@ -87,6 +132,7 @@ class TaskUpdateAPIView(UpdateAPIView):
     """
     Изменение информации о задаче.
     """
+
     serializer_class = TaskUpdateSerializer
     queryset = Task.objects.all()
 
@@ -105,5 +151,6 @@ class TaskDestroyAPIView(DestroyAPIView):
     """
     Удаление задачи.
     """
+
     serializer_class = TaskSerializer
     queryset = Task.objects.all()

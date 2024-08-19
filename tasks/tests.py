@@ -13,16 +13,16 @@ class EmployeeTestCase(APITestCase):
 
     def setUp(self):
         self.user1 = User.objects.create(email="user1@example.com")
-        self.employee1 = Employee.objects.create(name="Первый Тестовый Сотрудник", position="Тестовая1")
+        self.employee1 = Employee.objects.create(
+            name="Первый Тестовый Сотрудник", position="Тестовая1"
+        )
 
     def test_str_habit(self):
         """
-        Тестирует строчное представление сотрудника
+        Тестирует строчное представление сотрудника.
         """
         employee = Employee.objects.get(pk=self.employee1.pk)
-        self.assertEqual(
-            str(employee), f"{employee.name} ({employee.position})"
-        )
+        self.assertEqual(str(employee), f"{employee.name} ({employee.position})")
 
     def test_employee_retrieve_unauthenticated_user(self):
         """
@@ -133,60 +133,66 @@ class EmployeeTestCase(APITestCase):
         message = response.json()["non_field_errors"]
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
-            message, [
+            message,
+            [
                 "Фамилия, имя и отчетсво могут содержать только буквы кириллицы и дефисы. "
                 "Фамилия, имя и отчетсво начинаются с заглавной буквы. Допустимо отсутсвие отчества."
-            ]
+            ],
         )
 
         response = self.client.post(url, data=data[5])
         message = response.json()["non_field_errors"]
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
-            message, [
+            message,
+            [
                 "Фамилия, имя и отчетсво могут содержать только буквы кириллицы и дефисы. "
                 "Фамилия, имя и отчетсво начинаются с заглавной буквы. Допустимо отсутсвие отчества."
-            ]
+            ],
         )
 
         response = self.client.post(url, data=data[6])
         message = response.json()["non_field_errors"]
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
-            message, [
+            message,
+            [
                 "Фамилия, имя и отчетсво могут содержать только буквы кириллицы и дефисы. "
                 "Фамилия, имя и отчетсво начинаются с заглавной буквы. Допустимо отсутсвие отчества."
-            ]
+            ],
         )
 
         response = self.client.post(url, data=data[7])
         message = response.json()["non_field_errors"]
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
-            message, [
+            message,
+            [
                 "Фамилия, имя и отчетсво могут содержать только буквы кириллицы и дефисы. "
                 "Фамилия, имя и отчетсво начинаются с заглавной буквы. Допустимо отсутсвие отчества."
-            ]
+            ],
         )
 
         response = self.client.post(url, data=data[8])
         message = response.json()["non_field_errors"]
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
-            message, [
+            message,
+            [
                 "Фамилия, имя и отчетсво могут содержать только буквы кириллицы и дефисы. "
                 "Фамилия, имя и отчетсво начинаются с заглавной буквы. Допустимо отсутсвие отчества."
-            ]
+            ],
         )
 
         response = self.client.post(url, data=data[9])
         message = response.json()["non_field_errors"]
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
-            message, [
+            message,
+            [
                 "Фамилия, имя и отчетсво могут содержать только буквы кириллицы и дефисы. "
                 "Фамилия, имя и отчетсво начинаются с заглавной буквы. Допустимо отсутсвие отчества."
-            ]
+            ],
         )
 
     def test_employee_update_unauthenticated_user(self):
@@ -221,10 +227,11 @@ class EmployeeTestCase(APITestCase):
         message = response.json()["non_field_errors"]
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
-            message, [
+            message,
+            [
                 "Фамилия, имя и отчетсво могут содержать только буквы кириллицы и дефисы. "
                 "Фамилия, имя и отчетсво начинаются с заглавной буквы. Допустимо отсутсвие отчества."
-            ]
+            ],
         )
 
     def test_employee_delete_unauthenticated_user(self):
@@ -252,7 +259,7 @@ class EmployeeTestCase(APITestCase):
         """
         Тестирует получение списка сотрудников без аутентификации.
         """
-        url = reverse('tasks:employees-list')
+        url = reverse("tasks:employees-list")
 
         response = self.client.get(url)
         data = response.json()
@@ -266,9 +273,9 @@ class EmployeeTestCase(APITestCase):
                     "tasks": [],
                     "task_count": 0,
                     "name": self.employee1.name,
-                    "position": self.employee1.position
+                    "position": self.employee1.position,
                 },
-            ]
+            ],
         }
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data, result)
@@ -277,7 +284,7 @@ class EmployeeTestCase(APITestCase):
         """
         Тестирует получение списка сотрудников аутентифицировнным пользователем.
         """
-        url = reverse('tasks:employees-list')
+        url = reverse("tasks:employees-list")
 
         response = self.client.get(url)
         data = response.json()
@@ -291,9 +298,9 @@ class EmployeeTestCase(APITestCase):
                     "tasks": [],
                     "task_count": 0,
                     "name": self.employee1.name,
-                    "position": self.employee1.position
+                    "position": self.employee1.position,
                 },
-            ]
+            ],
         }
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data, result)
@@ -306,18 +313,42 @@ class TaskTestCase(APITestCase):
 
     def setUp(self):
         self.user1 = User.objects.create(email="user1@example.com")
-        self.employee1 = Employee.objects.create(name="Первый тестовый сотрудник", position="Должность")
-        self.employee2 = Employee.objects.create(name="Второй тестовый сотрудник", position="Должность")
-        self.employee3 = Employee.objects.create(name="Третий тестовый сотрудник", position="Должность")
-        self.employee4 = Employee.objects.create(name="Четвертый тестовый сотрудник", position="Должность")
-        self.task1 = Task.objects.create(title="Тестовая задача1", deadline="2025-01-01")
-        self.task2 = Task.objects.create(title="Тестовая задача2", deadline="2025-01-01")
-        self.task3 = Task.objects.create(title="Тестовая задача3", deadline="2025-01-01")
-        self.task4 = Task.objects.create(title="Тестовая задача4", deadline="2025-01-01", parent_task=self.task1,
-                                         executor=self.employee1)
-        self.task5 = Task.objects.create(title="Тестовая задача5", deadline="2025-01-01", parent_task=self.task2,
-                                         executor=self.employee1)
-        self.task6 = Task.objects.create(title="Тестовая задача6", deadline="2025-01-01", executor=self.employee2)
+        self.employee1 = Employee.objects.create(
+            name="Первый тестовый сотрудник", position="Должность"
+        )
+        self.employee2 = Employee.objects.create(
+            name="Второй тестовый сотрудник", position="Должность"
+        )
+        self.employee3 = Employee.objects.create(
+            name="Третий тестовый сотрудник", position="Должность"
+        )
+        self.employee4 = Employee.objects.create(
+            name="Четвертый тестовый сотрудник", position="Должность"
+        )
+        self.task1 = Task.objects.create(
+            title="Тестовая задача1", deadline="2025-01-01"
+        )
+        self.task2 = Task.objects.create(
+            title="Тестовая задача2", deadline="2025-01-01"
+        )
+        self.task3 = Task.objects.create(
+            title="Тестовая задача3", deadline="2025-01-01"
+        )
+        self.task4 = Task.objects.create(
+            title="Тестовая задача4",
+            deadline="2025-01-01",
+            parent_task=self.task1,
+            executor=self.employee1,
+        )
+        self.task5 = Task.objects.create(
+            title="Тестовая задача5",
+            deadline="2025-01-01",
+            parent_task=self.task2,
+            executor=self.employee1,
+        )
+        self.task6 = Task.objects.create(
+            title="Тестовая задача6", deadline="2025-01-01", executor=self.employee2
+        )
 
     def test_str_task(self):
         """
@@ -325,14 +356,18 @@ class TaskTestCase(APITestCase):
         """
         task1 = Task.objects.get(pk=1)
         task2 = Task.objects.get(pk=6)
-        self.assertEqual(str(self.task1), f"{task1.title} до {task1.deadline} ({task1.status})")
-        self.assertEqual(str(self.task6), f"{task2.title} до {task2.deadline} ({task2.status})")
+        self.assertEqual(
+            str(self.task1), f"{task1.title} до {task1.deadline} ({task1.status})"
+        )
+        self.assertEqual(
+            str(self.task6), f"{task2.title} до {task2.deadline} ({task2.status})"
+        )
 
     def test_task_retrieve_unauthenticated_user(self):
         """
         Тестирует получение информации о задаче без аутентификации.
         """
-        url = reverse('tasks:task', args=(self.task1.pk,))
+        url = reverse("tasks:task", args=(self.task1.pk,))
         response = self.client.get(url)
         data = response.json()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -344,7 +379,7 @@ class TaskTestCase(APITestCase):
         Тестирует получение информации о задаче аутентифицированным пользователем.
         """
         self.client.force_authenticate(user=self.user1)
-        url = reverse('tasks:task', args=(self.task1.pk,))
+        url = reverse("tasks:task", args=(self.task1.pk,))
         response = self.client.get(url)
         data = response.json()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -355,7 +390,7 @@ class TaskTestCase(APITestCase):
         """
         Тестирует создание задачи без аутентификации.
         """
-        url = reverse('tasks:task-create')
+        url = reverse("tasks:task-create")
         data = {"title": "Тестовая задача7", "deadline": "2025-01-01"}
 
         response = self.client.post(url, data=data)
@@ -366,14 +401,23 @@ class TaskTestCase(APITestCase):
         """
         Тестирует создание задачи аутентифицированным пользователем.
         """
-        url = reverse('tasks:task-create')
-        data = [{"title": "Тестовая задача7", "deadline": "2025-01-01"},
-                {"title": "Тестовая задача8", "deadline": "2025-01-01", "parent_task": self.task3.pk,
-                 "executor": self.employee1.pk},
-                {"title": "Тестовая задача9", "deadline": "2024-01-01"},
-                {"title": "Тестовая задача8", "deadline": "2024-12-01", "parent_task": self.task1.pk,
-                 "executor": self.employee1.pk}
-                ]
+        url = reverse("tasks:task-create")
+        data = [
+            {"title": "Тестовая задача7", "deadline": "2025-01-01"},
+            {
+                "title": "Тестовая задача8",
+                "deadline": "2025-01-01",
+                "parent_task": self.task3.pk,
+                "executor": self.employee1.pk,
+            },
+            {"title": "Тестовая задача9", "deadline": "2024-01-01"},
+            {
+                "title": "Тестовая задача8",
+                "deadline": "2024-12-01",
+                "parent_task": self.task1.pk,
+                "executor": self.employee1.pk,
+            },
+        ]
 
         self.client.force_authenticate(user=self.user1)
 
@@ -399,7 +443,7 @@ class TaskTestCase(APITestCase):
         """
         Тестирует изменение задачи без аутентификации.
         """
-        url = reverse('tasks:task-update', args=(self.task1.pk,))
+        url = reverse("tasks:task-update", args=(self.task1.pk,))
         data = {"title": "Измененная тестовая задача1", "executor": self.employee2}
 
         response = self.client.patch(url, data=data)
@@ -411,12 +455,17 @@ class TaskTestCase(APITestCase):
         Тестирует изменение задачи аутентифицированным пользователем.
         """
 
-        url = reverse('tasks:task-update', args=(self.task1.pk,))
-        data = [{"title": "Измененная тестовая задача1", "executor": self.employee2.pk},
-                {"title": "Измененная тестовая задача1", "status": "DONE"},
-                {"title": "Измененная тестовая задача1", "deadline": "2024-01-01"},
-                {"title": "Измененная тестовая задача1", "deadline": "2024-12-01", "parent_task": self.task1.pk}
-                ]
+        url = reverse("tasks:task-update", args=(self.task1.pk,))
+        data = [
+            {"title": "Измененная тестовая задача1", "executor": self.employee2.pk},
+            {"title": "Измененная тестовая задача1", "status": "DONE"},
+            {"title": "Измененная тестовая задача1", "deadline": "2024-01-01"},
+            {
+                "title": "Измененная тестовая задача1",
+                "deadline": "2024-12-01",
+                "parent_task": self.task1.pk,
+            },
+        ]
 
         self.client.force_authenticate(user=self.user1)
 
@@ -480,7 +529,7 @@ class TaskTestCase(APITestCase):
                     "deadline": self.task1.deadline,
                     "status": self.task1.status,
                     "parent_task": None,
-                    "executor": None
+                    "executor": None,
                 },
                 {
                     "id": self.task2.pk,
@@ -488,7 +537,7 @@ class TaskTestCase(APITestCase):
                     "deadline": self.task2.deadline,
                     "status": self.task2.status,
                     "parent_task": None,
-                    "executor": None
+                    "executor": None,
                 },
                 {
                     "id": self.task3.pk,
@@ -496,7 +545,7 @@ class TaskTestCase(APITestCase):
                     "deadline": self.task3.deadline,
                     "status": self.task3.status,
                     "parent_task": None,
-                    "executor": None
+                    "executor": None,
                 },
                 {
                     "id": self.task4.pk,
@@ -504,7 +553,7 @@ class TaskTestCase(APITestCase):
                     "deadline": self.task4.deadline,
                     "status": self.task4.status,
                     "parent_task": self.task4.parent_task.pk,
-                    "executor": self.task4.executor.pk
+                    "executor": self.task4.executor.pk,
                 },
                 {
                     "id": self.task5.pk,
@@ -512,9 +561,9 @@ class TaskTestCase(APITestCase):
                     "deadline": self.task5.deadline,
                     "status": self.task5.status,
                     "parent_task": self.task5.parent_task.pk,
-                    "executor": self.task5.executor.pk
+                    "executor": self.task5.executor.pk,
                 },
-            ]
+            ],
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -541,7 +590,7 @@ class TaskTestCase(APITestCase):
                     "deadline": self.task1.deadline,
                     "status": self.task1.status,
                     "parent_task": None,
-                    "executor": None
+                    "executor": None,
                 },
                 {
                     "id": self.task2.pk,
@@ -549,7 +598,7 @@ class TaskTestCase(APITestCase):
                     "deadline": self.task2.deadline,
                     "status": self.task2.status,
                     "parent_task": None,
-                    "executor": None
+                    "executor": None,
                 },
                 {
                     "id": self.task3.pk,
@@ -557,7 +606,7 @@ class TaskTestCase(APITestCase):
                     "deadline": self.task3.deadline,
                     "status": self.task3.status,
                     "parent_task": None,
-                    "executor": None
+                    "executor": None,
                 },
                 {
                     "id": self.task4.pk,
@@ -565,7 +614,7 @@ class TaskTestCase(APITestCase):
                     "deadline": self.task4.deadline,
                     "status": self.task4.status,
                     "parent_task": self.task4.parent_task.pk,
-                    "executor": self.task4.executor.pk
+                    "executor": self.task4.executor.pk,
                 },
                 {
                     "id": self.task5.pk,
@@ -573,9 +622,9 @@ class TaskTestCase(APITestCase):
                     "deadline": self.task5.deadline,
                     "status": self.task5.status,
                     "parent_task": self.task5.parent_task.pk,
-                    "executor": self.task5.executor.pk
+                    "executor": self.task5.executor.pk,
                 },
-            ]
+            ],
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
