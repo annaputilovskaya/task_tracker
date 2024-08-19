@@ -28,7 +28,7 @@ class EmployeeTestCase(APITestCase):
         """
         Тестирует просмотр сотрудника без аутентификации.
         """
-        url = reverse("tasks:employees-detail", args=(self.employee1.pk,))
+        url = reverse("tasks:employee", args=(self.employee1.pk,))
         response = self.client.get(url)
         data = response.json()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -40,7 +40,7 @@ class EmployeeTestCase(APITestCase):
         Тестирует просмотр сотрудника аутентифиуировнным пользователем.
         """
         self.client.force_authenticate(user=self.user1)
-        url = reverse("tasks:employees-detail", args=(self.employee1.pk,))
+        url = reverse("tasks:employee", args=(self.employee1.pk,))
         response = self.client.get(url)
         data = response.json()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -51,7 +51,7 @@ class EmployeeTestCase(APITestCase):
         """
         Тестирует создание нового сотрудника без аутнентификации.
         """
-        url = reverse("tasks:employees-list")
+        url = reverse("tasks:employee-create")
         data = {
             "name": "Второй тестовый сотрудник",
             "position": "Тестовая2",
@@ -65,7 +65,7 @@ class EmployeeTestCase(APITestCase):
         Тестирует создание нового сотрудника аутентифиуировнным пользователем.
         """
 
-        url = reverse("tasks:employees-list")
+        url = reverse("tasks:employee-create")
         data = [
             {
                 "name": "Второй тестовый Сотрудник",
@@ -199,7 +199,7 @@ class EmployeeTestCase(APITestCase):
         """
         Тестирует изменение сотрудника без аутентификации.
         """
-        url = reverse("tasks:employees-detail", args=(self.employee1.pk,))
+        url = reverse("tasks:employee-update", args=(self.employee1.pk,))
         data = {"name": "Измененный тестовый сотрудник"}
 
         response = self.client.put(url, data=data)
@@ -209,7 +209,7 @@ class EmployeeTestCase(APITestCase):
         """
         Тестирует изменение сотрудника аутентифицировнным пользователем.
         """
-        url = reverse("tasks:employees-detail", args=(self.employee1.pk,))
+        url = reverse("tasks:employee-update", args=(self.employee1.pk,))
         data = [
             {"name": "Измененный тестовый сотрудник"},
             {"name": "Default измененный тестовый сотрудник"},
@@ -238,7 +238,7 @@ class EmployeeTestCase(APITestCase):
         """
         Тестирует удаление сотрудника без аутентификации.
         """
-        url = reverse("tasks:employees-detail", args=(self.employee1.pk,))
+        url = reverse("tasks:employee-delete", args=(self.employee1.pk,))
 
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -249,7 +249,7 @@ class EmployeeTestCase(APITestCase):
         Тестирует удаление сотрудника аутентифицировнным пользователем.
         """
         self.client.force_authenticate(user=self.user1)
-        url = reverse("tasks:employees-detail", args=(self.employee1.pk,))
+        url = reverse("tasks:employee-delete", args=(self.employee1.pk,))
 
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -259,7 +259,7 @@ class EmployeeTestCase(APITestCase):
         """
         Тестирует получение списка сотрудников без аутентификации.
         """
-        url = reverse("tasks:employees-list")
+        url = reverse("tasks:employees")
 
         response = self.client.get(url)
         data = response.json()
@@ -270,8 +270,6 @@ class EmployeeTestCase(APITestCase):
             "results": [
                 {
                     "id": self.employee1.pk,
-                    "tasks": [],
-                    "task_count": 0,
                     "name": self.employee1.name,
                     "position": self.employee1.position,
                 },
@@ -284,7 +282,41 @@ class EmployeeTestCase(APITestCase):
         """
         Тестирует получение списка сотрудников аутентифицировнным пользователем.
         """
-        url = reverse("tasks:employees-list")
+        url = reverse("tasks:employees")
+        self.client.force_authenticate(user=self.user1)
+
+        response = self.client.get(url)
+        data = response.json()
+        result = {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [
+                {
+                    "id": self.employee1.pk,
+                    "name": self.employee1.name,
+                    "position": self.employee1.position,
+                },
+            ],
+        }
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(data, result)
+
+    def test_busy_employee_list_unauthenticated_user(self):
+        """
+        Тестирует получение списка занятых сотрудников без аутентификации.
+        """
+        url = reverse("tasks:busy-employees")
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_busy_employee_list_authenticated_user(self):
+        """
+        Тестирует получение списка занятых сотрудников аутентифицировнным пользователем.
+        """
+        url = reverse("tasks:busy-employees")
+        self.client.force_authenticate(user=self.user1)
 
         response = self.client.get(url)
         data = response.json()

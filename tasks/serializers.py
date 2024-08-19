@@ -10,6 +10,21 @@ class EmployeeSerializer(ModelSerializer):
     Сериализатор сотрудника.
     """
 
+    class Meta:
+        model = Employee
+        fields = "__all__"
+        validators = [
+            NameValidator(
+                field="name",
+            ),
+        ]
+
+
+class BusyEmployeeListSerializer(ModelSerializer):
+    """
+    Сериализатор списка занятых сотрудников.
+    """
+
     tasks = SerializerMethodField()
     task_count = SerializerMethodField()
 

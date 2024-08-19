@@ -4,67 +4,134 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      ListAPIView, RetrieveAPIView,
                                      UpdateAPIView)
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import AllowAny
 
 from tasks.models import Employee, Task
 from tasks.paginations import CustomPagination
-from tasks.serializers import (EmployeeSerializer, ImportantTaskSerializer,
-                               TaskSerializer, TaskUpdateSerializer)
+from tasks.serializers import (BusyEmployeeListSerializer, EmployeeSerializer,
+                               ImportantTaskSerializer, TaskSerializer,
+                               TaskUpdateSerializer)
 
 
-@method_decorator(
-    name="list",
-    decorator=swagger_auto_schema(
-        operation_description="Контроллер постраничного вывода списка сотрудников, "
-        "отсортированных по количеству активных задач, "
-        "с указанием количества активных задач."
-    ),
-)
-@method_decorator(
-    name="retrieve",
-    decorator=swagger_auto_schema(
-        operation_description="Контроллер просмотра информации по сотруднику."
-    ),
-)
-@method_decorator(
-    name="create",
-    decorator=swagger_auto_schema(
-        operation_description="Контроллер создания сотрудника."
-    ),
-)
-@method_decorator(
-    name="update",
-    decorator=swagger_auto_schema(
-        operation_description="Контроллер изменения сотрудника."
-    ),
-)
-@method_decorator(
-    name="destroy",
-    decorator=swagger_auto_schema(
-        operation_description="Контроллер удаления сотрудника."
-    ),
-)
-class EmployeeViewSet(ModelViewSet):
+# @method_decorator(
+#     name="list",
+#     decorator=swagger_auto_schema(
+#         operation_description="Контроллер постраничного вывода списка сотрудников, "
+#         "отсортированных по количеству активных задач, "
+#         "с указанием количества активных задач."
+#     ),
+# )
+# @method_decorator(
+#     name="retrieve",
+#     decorator=swagger_auto_schema(
+#         operation_description="Контроллер просмотра информации по сотруднику."
+#     ),
+# )
+# @method_decorator(
+#     name="create",
+#     decorator=swagger_auto_schema(
+#         operation_description="Контроллер создания сотрудника."
+#     ),
+# )
+# @method_decorator(
+#     name="update",
+#     decorator=swagger_auto_schema(
+#         operation_description="Контроллер изменения сотрудника."
+#     ),
+# )
+# @method_decorator(
+#     name="destroy",
+#     decorator=swagger_auto_schema(
+#         operation_description="Контроллер удаления сотрудника."
+#     ),
+# )
+# class EmployeeViewSet(ModelViewSet):
+#     """
+#     Контроллер модели сотрудника.
+#     """
+#
+#     serializer_class = EmployeeSerializer
+#     permission_classes = (IsAuthenticatedOrReadOnly,)
+#     pagination_class = CustomPagination
+#
+#     def get_queryset(self):
+#         """
+#         Возвращает список сотрудников,
+#         отсортированный по количеству их активных задач
+#         """
+#         queryset = (
+#             Employee.objects.all()
+#             .annotate(task_count=Count("tasks"))
+#             .order_by("task_count")
+#         )
+#         return queryset
+#
+class EmployeeCreateAPIView(CreateAPIView):
     """
-    Контроллер модели сотрудника.
+    Контроллер создания сотрудника.
     """
 
+    queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+
+class EmployeeListAPIView(ListAPIView):
+    """
+    Контроллер постраничного вывода списка сотрудников.
+    """
+
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+    pagination_class = CustomPagination
+    permission_classes = (AllowAny,)
+
+
+class BusyEmployeeListAPIView(ListAPIView):
+    """
+    Контроллер постраничного вывода списка сотрудников,
+    отсортированных по количеству их активных задач
+    с указанием количества активных задач.
+    """
+
+    queryset = Employee.objects.all()
+    serializer_class = BusyEmployeeListSerializer
     pagination_class = CustomPagination
 
     def get_queryset(self):
-        """
-        Возвращает список сотрудников,
-        отсортированный по количеству их активных задач
-        """
-        queryset = (
-            Employee.objects.all()
-            .annotate(task_count=Count("tasks"))
-            .order_by("task_count")
+        self.queryset = Employee.objects.all()
+        self.queryset = self.queryset.select_related()
+        self.queryset = Employee.objects.annotate(tasks_count=Count("tasks")).order_by(
+            "-tasks_count"
         )
-        return queryset
+        return self.queryset
+
+
+class EmployeeRetrieveAPIView(RetrieveAPIView):
+    """
+    Контроллер просмотра информации по сотруднику.
+    """
+
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+    permission_classes = (AllowAny,)
+
+
+class EmployeeUpdateAPIView(UpdateAPIView):
+    """
+    Контроллер изменения сотрудника.
+    """
+
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+
+
+class EmployeeDestroyAPIView(DestroyAPIView):
+    """
+    Контроллер удаления сотрудника.
+    """
+
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
 
 
 class TaskCreateAPIView(CreateAPIView):
